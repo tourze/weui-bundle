@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
+    <meta name="wechat-enable-text-zoom-em" content="true">
+    <title>{{ title }}</title>
+    <link href="https://res.wx.qq.com/t/wx_fed/weui-source/res/2.5.5/weui.min.css" rel="stylesheet">
+    <script type="text/javascript">
+        function closeWX() {
+            var isLppzApp = false
+            var ua = navigator.userAgent.toLowerCase()
+            var uaApp = ua ? ua.match(/BeStore/i) : '' // match方法返回的是对象
+            var uaAndroid = /android/i.test(ua) // test返回的是true/false
+            var uaIos = /iphone|ipad|ipod/i.test(ua)
+            if (uaApp && uaApp.toString() === 'bestore') { // 必须将match返回的对象转成字符串
+                isLppzApp = true
+            } else {
+                isLppzApp = false
+            }
+
+            if (window.WeixinJSBridge) {
+                window.WeixinJSBridge.call('closeWindow') // 微信，只是微信就用这个API。
+                return;
+            }
+
+            if (window.AlipayJSBridge) {
+                window.AlipayJSBridge.call('closeWebview') // 支付宝
+                return;
+            }
+
+            if (isLppzApp) {
+                if (uaAndroid) {
+                    window.obj.closePageLppzRequest('') // 安卓app
+                }
+                if (uaIos) {
+                    window.webkit.messageHandlers.closePageLppzRequest.postMessage('') //ios app
+                }
+                return;
+            }
+
+            if (window.close) {
+                window.close();
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="weui-msg">
+    {% block icon %}
+    {% endblock %}
+    <div class="weui-msg__text-area">
+        <h2 class="weui-msg__title">{{ title }}</h2>
+        <p class="weui-msg__desc">{{ subtitle }}</p>
+    </div>
+    {% if showOp %}
+    <div class="weui-msg__opr-area">
+        <p class="weui-btn-area">
+            <a href="javascript:window.closeWX();" role="button" class="weui-btn weui-btn_primary">关闭页面</a>
+        </p>
+    </div>
+    {% endif %}
+    <div class="weui-msg__extra-area">
+        <div class="weui-footer">
+            <p class="weui-footer__text">Copyright © {{ company }}</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
