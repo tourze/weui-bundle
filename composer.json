@@ -13,6 +13,7 @@
     "symfony/http-kernel": "^6.4",
     "symfony/framework-bundle": "^6.4",
     "symfony/twig-bundle": "^6.4",
+    "symfony/yaml": "^6.4 || ^7.1",
     "twig/twig": "^3.13|^4.0"
   },
   "autoload": {
