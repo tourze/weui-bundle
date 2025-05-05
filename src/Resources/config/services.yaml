@@ -6,3 +6,7 @@ services:
 
   WeuiBundle\Service\:
     resource: '../../Service/'
+    
+  # 将 NoticeService 设置为 public，以便测试访问
+  WeuiBundle\Service\NoticeService:
+    public: true
