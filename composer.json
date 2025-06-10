@@ -20,6 +20,7 @@
     "symfony/twig-bundle": "^6.4",
     "symfony/yaml": "^6.4 || ^7.1",
     "tourze/bundle-dependency": "0.0.*",
+    "tourze/symfony-integration-test-kernel": "0.0.*",
     "twig/twig": "^3.13|^4.0"
   },
   "require-dev": {
