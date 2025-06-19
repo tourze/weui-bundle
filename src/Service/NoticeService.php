@@ -2,7 +2,7 @@
 
 namespace WeuiBundle\Service;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
@@ -19,7 +19,7 @@ class NoticeService
                 'title' => $title,
                 'subtitle' => $subTitle,
                 'showOp' => $showOp,
-                'year' => Carbon::now()->year,
+                'year' => CarbonImmutable::now()->year,
                 'company' => $_ENV['COMPANY_NAME'] ?? '',
             ])
         );
@@ -32,7 +32,7 @@ class NoticeService
                 'title' => $title,
                 'subtitle' => $subTitle,
                 'showOp' => $showOp,
-                'year' => Carbon::now()->year,
+                'year' => CarbonImmutable::now()->year,
                 'company' => $_ENV['COMPANY_NAME'] ?? '',
             ])
         );

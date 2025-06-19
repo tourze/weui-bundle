@@ -2,7 +2,7 @@
 
 namespace WeuiBundle\Tests\Service;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
@@ -26,7 +26,7 @@ class NoticeServiceTest extends TestCase
     {
         // 设置模拟行为
         $expectedTitle = '成功标题';
-        $expectedYear = Carbon::now()->year;
+        $expectedYear = CarbonImmutable::now()->year;
         $expectedCompany = '';
 
         $this->twig->method('render')
@@ -56,7 +56,7 @@ class NoticeServiceTest extends TestCase
         $expectedTitle = '成功标题';
         $expectedSubtitle = '成功副标题';
         $expectedShowOp = false;
-        $expectedYear = Carbon::now()->year;
+        $expectedYear = CarbonImmutable::now()->year;
 
         $this->twig->method('render')
             ->with(
@@ -82,7 +82,7 @@ class NoticeServiceTest extends TestCase
     {
         // 设置模拟行为
         $expectedTitle = '错误标题';
-        $expectedYear = Carbon::now()->year;
+        $expectedYear = CarbonImmutable::now()->year;
         $expectedCompany = '';
 
         $this->twig->method('render')
@@ -112,7 +112,7 @@ class NoticeServiceTest extends TestCase
         $expectedTitle = '错误标题';
         $expectedSubtitle = '错误详情';
         $expectedShowOp = false;
-        $expectedYear = Carbon::now()->year;
+        $expectedYear = CarbonImmutable::now()->year;
 
         $this->twig->method('render')
             ->with(
@@ -141,13 +141,13 @@ class NoticeServiceTest extends TestCase
 
         // 设置模拟行为
         $expectedTitle = '成功标题';
-        $expectedYear = Carbon::now()->year;
+        $expectedYear = CarbonImmutable::now()->year;
         $expectedCompany = '测试公司';
 
         $this->twig->method('render')
             ->with(
                 '@Weui/success.html.twig',
-                $this->callback(function ($params) use ($expectedTitle, $expectedYear, $expectedCompany) {
+                $this->callback(function ($params) use ($expectedTitle, $expectedCompany) {
                     return $params['title'] === $expectedTitle &&
                         $params['company'] === $expectedCompany;
                 })
