@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeuiBundle\Service;
 
 use Carbon\CarbonImmutable;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
+#[Autoconfigure(public: true)]
 class NoticeService
 {
     public function __construct(private readonly Environment $twig)

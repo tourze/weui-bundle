@@ -1,167 +1,103 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeuiBundle\Tests\Service;
 
-use Carbon\CarbonImmutable;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use WeuiBundle\Service\NoticeService;
 
-class NoticeServiceTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(NoticeService::class)]
+#[RunTestsInSeparateProcesses]
+final class NoticeServiceTest extends AbstractIntegrationTestCase
 {
-    private $twig;
     private NoticeService $noticeService;
 
-    protected function setUp(): void
+    protected function onSetUp(): void
     {
-        // 创建 Twig 环境的模拟对象
-        $this->twig = $this->createMock(Environment::class);
-
-        // 创建 NoticeService 实例
-        $this->noticeService = new NoticeService($this->twig);
+        $this->noticeService = self::getService(NoticeService::class);
     }
 
-    public function testWeuiSuccess_withDefaultParameters(): void
+    public function testWeuiSuccessWithDefaultParameters(): void
     {
-        // 设置模拟行为
-        $expectedTitle = '成功标题';
-        $expectedYear = CarbonImmutable::now()->year;
-        $expectedCompany = '';
+        $title = '成功标题';
 
-        $this->twig->method('render')
-            ->with(
-                '@Weui/success.html.twig',
-                $this->callback(function ($params) use ($expectedTitle, $expectedYear, $expectedCompany) {
-                    return $params['title'] === $expectedTitle &&
-                        $params['subtitle'] === '' &&
-                        $params['showOp'] === true &&
-                        $params['year'] === $expectedYear &&
-                        $params['company'] === $expectedCompany;
-                })
-            )
-            ->willReturn('<html>模拟成功页面</html>');
+        $response = $this->noticeService->weuiSuccess($title);
 
-        // 执行测试
-        $response = $this->noticeService->weuiSuccess($expectedTitle);
-
-        // 验证结果
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals('<html>模拟成功页面</html>', $response->getContent());
+        $this->assertEquals(200, $response->getStatusCode());
+        $content = $response->getContent();
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString($title, $content);
+        $this->assertStringContainsString('weui-icon-success', $content);
     }
 
-    public function testWeuiSuccess_withCustomParameters(): void
+    public function testWeuiSuccessWithCustomParameters(): void
     {
-        // 设置模拟行为
-        $expectedTitle = '成功标题';
-        $expectedSubtitle = '成功副标题';
-        $expectedShowOp = false;
-        $expectedYear = CarbonImmutable::now()->year;
+        $title = '成功标题';
+        $subtitle = '成功副标题';
+        $showOp = false;
 
-        $this->twig->method('render')
-            ->with(
-                '@Weui/success.html.twig',
-                $this->callback(function ($params) use ($expectedTitle, $expectedSubtitle, $expectedShowOp, $expectedYear) {
-                    return $params['title'] === $expectedTitle &&
-                        $params['subtitle'] === $expectedSubtitle &&
-                        $params['showOp'] === $expectedShowOp &&
-                        $params['year'] === $expectedYear;
-                })
-            )
-            ->willReturn('<html>模拟自定义成功页面</html>');
+        $response = $this->noticeService->weuiSuccess($title, $subtitle, $showOp);
 
-        // 执行测试
-        $response = $this->noticeService->weuiSuccess($expectedTitle, $expectedSubtitle, $expectedShowOp);
-
-        // 验证结果
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals('<html>模拟自定义成功页面</html>', $response->getContent());
+        $this->assertEquals(200, $response->getStatusCode());
+        $content = $response->getContent();
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString($title, $content);
+        $this->assertStringContainsString($subtitle, $content);
     }
 
-    public function testWeuiError_withDefaultParameters(): void
+    public function testWeuiErrorWithDefaultParameters(): void
     {
-        // 设置模拟行为
-        $expectedTitle = '错误标题';
-        $expectedYear = CarbonImmutable::now()->year;
-        $expectedCompany = '';
+        $title = '错误标题';
 
-        $this->twig->method('render')
-            ->with(
-                '@Weui/failed.html.twig',
-                $this->callback(function ($params) use ($expectedTitle, $expectedYear, $expectedCompany) {
-                    return $params['title'] === $expectedTitle &&
-                        $params['subtitle'] === '' &&
-                        $params['showOp'] === true &&
-                        $params['year'] === $expectedYear &&
-                        $params['company'] === $expectedCompany;
-                })
-            )
-            ->willReturn('<html>模拟错误页面</html>');
+        $response = $this->noticeService->weuiError($title);
 
-        // 执行测试
-        $response = $this->noticeService->weuiError($expectedTitle);
-
-        // 验证结果
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals('<html>模拟错误页面</html>', $response->getContent());
+        $this->assertEquals(200, $response->getStatusCode());
+        $content = $response->getContent();
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString($title, $content);
+        $this->assertStringContainsString('weui-icon-warn', $content);
     }
 
-    public function testWeuiError_withCustomParameters(): void
+    public function testWeuiErrorWithCustomParameters(): void
     {
-        // 设置模拟行为
-        $expectedTitle = '错误标题';
-        $expectedSubtitle = '错误详情';
-        $expectedShowOp = false;
-        $expectedYear = CarbonImmutable::now()->year;
+        $title = '错误标题';
+        $subtitle = '错误详情';
+        $showOp = false;
 
-        $this->twig->method('render')
-            ->with(
-                '@Weui/failed.html.twig',
-                $this->callback(function ($params) use ($expectedTitle, $expectedSubtitle, $expectedShowOp, $expectedYear) {
-                    return $params['title'] === $expectedTitle &&
-                        $params['subtitle'] === $expectedSubtitle &&
-                        $params['showOp'] === $expectedShowOp &&
-                        $params['year'] === $expectedYear;
-                })
-            )
-            ->willReturn('<html>模拟自定义错误页面</html>');
+        $response = $this->noticeService->weuiError($title, $subtitle, $showOp);
 
-        // 执行测试
-        $response = $this->noticeService->weuiError($expectedTitle, $expectedSubtitle, $expectedShowOp);
-
-        // 验证结果
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals('<html>模拟自定义错误页面</html>', $response->getContent());
+        $this->assertEquals(200, $response->getStatusCode());
+        $content = $response->getContent();
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString($title, $content);
+        $this->assertStringContainsString($subtitle, $content);
     }
 
     public function testCompanyNameFromEnvironment(): void
     {
-        // 设置环境变量
         $_ENV['COMPANY_NAME'] = '测试公司';
 
-        // 设置模拟行为
-        $expectedTitle = '成功标题';
-        $expectedYear = CarbonImmutable::now()->year;
-        $expectedCompany = '测试公司';
+        $title = '成功标题';
+        $response = $this->noticeService->weuiSuccess($title);
 
-        $this->twig->method('render')
-            ->with(
-                '@Weui/success.html.twig',
-                $this->callback(function ($params) use ($expectedTitle, $expectedCompany) {
-                    return $params['title'] === $expectedTitle &&
-                        $params['company'] === $expectedCompany;
-                })
-            )
-            ->willReturn('<html>包含公司名称的页面</html>');
-
-        // 执行测试
-        $response = $this->noticeService->weuiSuccess($expectedTitle);
-
-        // 验证结果
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals('<html>包含公司名称的页面</html>', $response->getContent());
+        $this->assertEquals(200, $response->getStatusCode());
+        $content = $response->getContent();
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString($title, $content);
+        $this->assertStringContainsString('测试公司', $content);
 
-        // 清除环境变量
         unset($_ENV['COMPANY_NAME']);
     }
 }

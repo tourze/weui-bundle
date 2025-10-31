@@ -1,63 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeuiBundle\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Tourze\IntegrationTestKernel\IntegrationTestKernel;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use WeuiBundle\Service\NoticeService;
 use WeuiBundle\WeuiBundle;
 
-class WeuiIntegrationTest extends KernelTestCase
+/**
+ * @internal
+ */
+#[CoversClass(WeuiBundle::class)]
+#[RunTestsInSeparateProcesses]
+final class WeuiIntegrationTest extends AbstractIntegrationTestCase
 {
-    protected static function createKernel(array $options = []): KernelInterface
-    {
-        $env = $options['environment'] ?? $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'test';
-        $debug = $options['debug'] ?? $_ENV['APP_DEBUG'] ?? $_SERVER['APP_DEBUG'] ?? true;
+    private NoticeService $noticeService;
 
-        return new IntegrationTestKernel($env, $debug, [
-            WeuiBundle::class => ['all' => true],
-        ]);
-    }
-
-    protected function setUp(): void
+    protected function onSetUp(): void
     {
-        self::bootKernel(['debug' => false]);
+        $this->noticeService = self::getService(NoticeService::class);
     }
 
     public function testServiceAvailability(): void
     {
-        $container = static::getContainer();
-        $noticeService = $container->get(NoticeService::class);
-
-        $this->assertInstanceOf(NoticeService::class, $noticeService);
+        $this->assertInstanceOf(NoticeService::class, $this->noticeService);
     }
 
     public function testWeuiSuccessResponse(): void
     {
-        // 获取容器和服务
-        $container = static::getContainer();
-        $noticeService = $container->get(NoticeService::class);
-
         // 测试默认参数
-        $response = $noticeService->weuiSuccess('测试标题');
+        $response = $this->noticeService->weuiSuccess('测试标题');
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertStringContainsString('测试标题', $response->getContent());
-        $this->assertStringContainsString('weui-icon-success', $response->getContent());
-        $this->assertStringContainsString('关闭页面', $response->getContent());
+        $content = $response->getContent();
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString('测试标题', $content);
+        $this->assertStringContainsString('weui-icon-success', $content);
+        $this->assertStringContainsString('关闭页面', $content);
 
         // 测试自定义副标题
-        $response = $noticeService->weuiSuccess('测试标题', '副标题内容');
+        $response = $this->noticeService->weuiSuccess('测试标题', '副标题内容');
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertStringContainsString('副标题内容', $response->getContent());
+        $content = $response->getContent();
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString('副标题内容', $content);
 
         // 测试隐藏操作按钮 - 修正测试方式
-        $response = $noticeService->weuiSuccess('测试标题', '副标题内容', false);
+        $response = $this->noticeService->weuiSuccess('测试标题', '副标题内容', false);
         $this->assertInstanceOf(Response::class, $response);
-        // 如果按钮隐藏，页面上应该没有操作区域
+        // 如枟按钮隐藏，页面上应该没有操作区域
         $content = $response->getContent();
-        if (strpos($content, 'weui-msg__opr-area') !== false) {
+        $this->assertNotFalse($content);
+        if (false !== strpos($content, 'weui-msg__opr-area')) {
             // 如果操作区域仍存在，可能需要验证它是否被隐藏或不包含按钮
             $this->assertStringNotContainsString('关闭页面', $content);
         }
@@ -65,28 +62,29 @@ class WeuiIntegrationTest extends KernelTestCase
 
     public function testWeuiErrorResponse(): void
     {
-        // 获取容器和服务
-        $container = static::getContainer();
-        $noticeService = $container->get(NoticeService::class);
-
         // 测试默认参数
-        $response = $noticeService->weuiError('错误标题');
+        $response = $this->noticeService->weuiError('错误标题');
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertStringContainsString('错误标题', $response->getContent());
-        $this->assertStringContainsString('weui-icon-warn', $response->getContent());
-        $this->assertStringContainsString('关闭页面', $response->getContent());
+        $content = $response->getContent();
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString('错误标题', $content);
+        $this->assertStringContainsString('weui-icon-warn', $content);
+        $this->assertStringContainsString('关闭页面', $content);
 
         // 测试自定义副标题
-        $response = $noticeService->weuiError('错误标题', '错误详情');
+        $response = $this->noticeService->weuiError('错误标题', '错误详情');
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertStringContainsString('错误详情', $response->getContent());
+        $content = $response->getContent();
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString('错误详情', $content);
 
         // 测试隐藏操作按钮 - 修正测试方式
-        $response = $noticeService->weuiError('错误标题', '错误详情', false);
+        $response = $this->noticeService->weuiError('错误标题', '错误详情', false);
         $this->assertInstanceOf(Response::class, $response);
         // 如果按钮隐藏，页面上应该没有操作区域
         $content = $response->getContent();
-        if (strpos($content, 'weui-msg__opr-area') !== false) {
+        $this->assertNotFalse($content);
+        if (false !== strpos($content, 'weui-msg__opr-area')) {
             // 如果操作区域仍存在，可能需要验证它是否被隐藏或不包含按钮
             $this->assertStringNotContainsString('关闭页面', $content);
         }
@@ -94,24 +92,22 @@ class WeuiIntegrationTest extends KernelTestCase
 
     public function testEnvironmentVariableHandling(): void
     {
-        // 获取容器和服务
-        $container = static::getContainer();
-        $noticeService = $container->get(NoticeService::class);
-
         // 设置环境变量
         $_ENV['COMPANY_NAME'] = '测试公司';
 
         // 测试环境变量渲染
-        $response = $noticeService->weuiSuccess('测试标题');
+        $response = $this->noticeService->weuiSuccess('测试标题');
         $content = $response->getContent();
+        $this->assertNotFalse($content);
         $this->assertStringContainsString('测试公司', $content);
 
         // 清除环境变量
         unset($_ENV['COMPANY_NAME']);
 
         // 测试无环境变量情况
-        $response = $noticeService->weuiSuccess('测试标题');
+        $response = $this->noticeService->weuiSuccess('测试标题');
         $content = $response->getContent();
+        $this->assertNotFalse($content);
         // 检查页面中的版权信息部分
         $this->assertStringContainsString('Copyright ©', $content);
         $this->assertStringNotContainsString('测试公司', $content);

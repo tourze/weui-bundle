@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeuiBundle;
 
 use Symfony\Bundle\TwigBundle\TwigBundle;
