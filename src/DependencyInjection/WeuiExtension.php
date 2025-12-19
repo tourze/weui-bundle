@@ -6,7 +6,7 @@ namespace WeuiBundle\DependencyInjection;
 
 use Tourze\SymfonyDependencyServiceLoader\AutoExtension;
 
-class WeuiExtension extends AutoExtension
+final class WeuiExtension extends AutoExtension
 {
     protected function getConfigDir(): string
     {
